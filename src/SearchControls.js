@@ -1,41 +1,22 @@
 import React from 'react'
-import petfinder, { ANIMALS } from './petfinder-client'
+import { ANIMALS } from './petfinder-client'
 
-const pf = petfinder()
+import { connect } from 'react-redux'
+import { setAnimal, setBreed, search, getBreeds } from './actionCreators'
 
 const SearchControls = React.createClass({
 
-	getInitialState() {
-		return {
-			breeds: []
-		}
-	},
-
-	getNewBreeds(animal) {
-		pf.breed.list({animal})
-			.then(data => {
-				if(data.petfinder.breeds) {
-					this.setState({breeds: data.petfinder.breeds.breed})
-				}
-			})
+	handleAnimalChange(event) {
+		this.props.dispatch(setAnimal(event.target.value))
 	},
 
 	handleBreedChange(event) {
-		this.props.changeBreed(event.target.value)
-	},
-
-	handleAnimalChange(event) {
-		this.props.changeAnimal(event.target.value)
+		this.props.dispatch(setBreed(event.target.value))
 	},
 
 	componentDidMount() {
-		this.getNewBreeds(this.props.animal)
-	},
-
-	componentWillReceiveProps(nextProps) {
-		if(nextProps.animal !== this.props.animal) {
-			this.getNewBreeds(nextProps.animal)
-		}
+		this.props.dispatch(search())
+		this.props.dispatch(getBreeds())
 	},
 
 	render() {
@@ -52,7 +33,7 @@ const SearchControls = React.createClass({
 		const breedSelector = !this.props.animal ? null : (
 			<select value={this.props.breed} onChange={this.handleBreedChange}>
 				<option value=""></option>
-				{this.state.breeds.map(breed => (
+				{this.props.breeds.map(breed => (
 					<option key={breed} value={breed}>{breed}</option>
 				))}
 			</select>
@@ -67,4 +48,12 @@ const SearchControls = React.createClass({
 	}
 })
 
-export default SearchControls
+const mapStateProps = (state) => {
+	return {
+		animal: state.animal,
+		breed: state.breed,
+		breeds: state.breeds
+	}
+}
+
+export default connect(mapStateProps)(SearchControls)

@@ -1,11 +1,14 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import { addFavorite, removeFavorite } from './actionCreators'
 
 const MAX_DESCRIPTION_LENGTH = 150
 
 const Pet = React.createClass({
 
 	handleFavoriteChange(event) {
-		this.props.toggleFavorite(this.props.pet, !this.props.isFavorite)
+		const action = this.props.isFavorite ? removeFavorite : addFavorite
+		this.props.dispatch(action(this.props.pet))
 	},
 
 	render() {
@@ -33,4 +36,4 @@ const Pet = React.createClass({
 	}
 })
 
-export default Pet
+export default connect()(Pet)
